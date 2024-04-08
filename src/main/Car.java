@@ -39,7 +39,7 @@ public class Car {
 
     // Validate the properties to ensure all required fields are present
     public static void validateProperties(Properties properties) {
-        String[] requiredParams = {"permit", "permitExpiration","license", "type", "owner"};
+        String[] requiredParams = {"permit", "permitExpiration", "license", "type", "owner"};
         List<String> missingParams = new ArrayList<>();
         for (String param : requiredParams) {
             if (properties.getProperty(param) == null) {

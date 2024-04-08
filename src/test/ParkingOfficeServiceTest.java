@@ -1,9 +1,6 @@
-package main;
-
+import main.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -15,7 +12,7 @@ class ParkingOfficeServiceTest {
     private Command carCommand;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         parkingOffice = mock(ParkingOffice.class);
         customerCommand = mock(Command.class);
         carCommand = mock(Command.class);
@@ -28,7 +25,7 @@ class ParkingOfficeServiceTest {
 
     // Happy Path
     @Test
-    void performCommandShouldExecuteWhenGivenValidKeyValueParameters(){
+    void performCommandShouldExecuteWhenGivenValidKeyValueParameters() {
         String[] parameters = {"param1=value1", "param2=value2"};
         parkingOfficeService.performCommand("CUSTOMER", parameters);
         verify(customerCommand, times(1)).execute(any());
@@ -37,7 +34,7 @@ class ParkingOfficeServiceTest {
     }
 
     @Test
-    void performCommandShouldExecuteWithValidCommandAndUnrecognizedKeyInParameters(){
+    void performCommandShouldExecuteWithValidCommandAndUnrecognizedKeyInParameters() {
         String[] parameters = {"unrecognizedKey=value1", "param2=value2"};
         parkingOfficeService.performCommand("CUSTOMER", parameters);
         verify(customerCommand, times(1)).execute(any());
@@ -47,7 +44,7 @@ class ParkingOfficeServiceTest {
 
     // Sad Path
     @Test
-    void performCommandShouldNotExecuteWithNullCommand(){
+    void performCommandShouldNotExecuteWithNullCommand() {
         String[] parameters = {"param1=value1", "param2=value2"};
         parkingOfficeService.performCommand(null, parameters);
         verify(customerCommand, times(0)).execute(any());
@@ -55,28 +52,29 @@ class ParkingOfficeServiceTest {
     }
 
     @Test
-    void performCommandShouldNotExecuteWithNullParameters(){
+    void performCommandShouldNotExecuteWithNullParameters() {
         parkingOfficeService.performCommand("CUSTOMER", null);
         verify(customerCommand, times(0)).execute(any());
         parkingOfficeService.performCommand("CAR", null);
         verify(carCommand, times(0)).execute(any());
     }
+
     @Test
-    void performCommandShouldReturnErrorMessageWithInvalidParameters(){
+    void performCommandShouldReturnErrorMessageWithInvalidParameters() {
         String[] parameters = {"param1"}; // Invalid because it doesn't contain '='
         String result = parkingOfficeService.performCommand("CUSTOMER", parameters);
         assertTrue(result.startsWith("Invalid parameter format:"));
     }
 
     @Test
-    void performCommandShouldReturnErrorMessageWithInvalidCommand(){
+    void performCommandShouldReturnErrorMessageWithInvalidCommand() {
         String[] parameters = {"param1=value1"};
         String result = parkingOfficeService.performCommand("INVALID_COMMAND", parameters);
         assertEquals("Command not recognized.", result);
     }
 
     @Test
-    void performCommandForCustomerCommandShouldReturnErrorMessageWithMissingParameters(){
+    void performCommandForCustomerCommandShouldReturnErrorMessageWithMissingParameters() {
         // Create real instances of RegisterCustomerCommand and RegisterCarCommand
         Command customerCommand = new RegisterCustomerCommand(parkingOffice);
 
@@ -92,7 +90,7 @@ class ParkingOfficeServiceTest {
     }
 
     @Test
-    void performCommandForCarCommandShouldReturnErrorMessageWithMissingParameters(){
+    void performCommandForCarCommandShouldReturnErrorMessageWithMissingParameters() {
         // Create real instances of RegisterCustomerCommand and RegisterCarCommand
         Command carCommand = new RegisterCarCommand(parkingOffice);
 
@@ -106,9 +104,6 @@ class ParkingOfficeServiceTest {
         assertNotNull(result, "Result should not be null");
         assertEquals(result, "Parameter check failed: Missing required parameters: license, type, owner");
     }
-
-
-
 
 
 }

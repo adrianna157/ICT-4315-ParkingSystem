@@ -14,7 +14,7 @@ public class Customer {
     private String name;
     private Address address;
     private String phoneNumber;
-    private List<Car> cars;
+    private final List<Car> cars;
 
     public Customer(String customerId, String name, Address address, String phoneNumber) {
         this.customerId = customerId;
@@ -42,6 +42,7 @@ public class Customer {
 
         return new Customer(customerId, name, address, phoneNumber);
     }
+
     // Validate the properties to ensure all required fields are present
     public static void validateProperties(Properties properties) {
         String[] requiredParams = {"customerId", "name", "phoneNumber", "streetAddress1", "city", "state", "zipCode"};
@@ -129,7 +130,7 @@ public class Customer {
     }
 
     @Override
-    public boolean equals(Object o){
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Customer customer = (Customer) o;
@@ -137,7 +138,7 @@ public class Customer {
     }
 
     @Override
-    public int hashCode(){
+    public int hashCode() {
         return customerId.hashCode();
     }
 }

@@ -1,8 +1,9 @@
-package main;
-
-
+import main.Car;
+import main.ParkingOffice;
+import main.RegisterCarCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.util.Properties;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -14,7 +15,7 @@ class RegisterCarCommandTest {
     private Properties properties; // Make properties an instance variable
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         parkingOffice = mock(ParkingOffice.class);
         registerCarCommand = new RegisterCarCommand(parkingOffice);
         properties = new Properties(); // Initialize properties in the setUp method
@@ -27,67 +28,67 @@ class RegisterCarCommandTest {
 
     // Happy  path tests
     @Test
-    void executeShouldBeNullWhenSuccessful(){
+    void executeShouldBeNullWhenSuccessful() {
         String result = registerCarCommand.execute(properties);
         assertNull(result);
     }
 
     @Test
-    void executeShouldReturnPermitIdOnSuccess(){
+    void executeShouldReturnPermitIdOnSuccess() {
         when(parkingOffice.register(any(Car.class))).thenReturn("permitId123");
         String result = registerCarCommand.execute(properties);
         assertEquals("permitId123", result);
     }
 
     @Test
-    void executeShouldCallRegisterCar(){
+    void executeShouldCallRegisterCar() {
         registerCarCommand.execute(properties);
         verify(parkingOffice, times(1)).register(any(Car.class));
     }
 
     @Test
-    void getCommandNameShouldReturnCorrectCommandName(){
+    void getCommandNameShouldReturnCorrectCommandName() {
         assertEquals("CAR", registerCarCommand.getCommandName());
     }
 
     @Test
-    void getDisplayNameShouldReturnCorrectDisplayName(){
+    void getDisplayNameShouldReturnCorrectDisplayName() {
         assertEquals("Register Car", registerCarCommand.getDisplayName());
     }
 
     // Sad path tests
     @Test
-    void executeShouldThrowExceptionWhenPermitIsMissing(){
+    void executeShouldThrowExceptionWhenPermitIsMissing() {
         properties.remove("permit");
         assertThrows(IllegalArgumentException.class, () -> registerCarCommand.execute(properties));
     }
 
     @Test
-    void executeShouldThrowExceptionWhenPermitExpirationIsMissing(){
+    void executeShouldThrowExceptionWhenPermitExpirationIsMissing() {
         properties.remove("permitExpiration");
         assertThrows(IllegalArgumentException.class, () -> registerCarCommand.execute(properties));
     }
 
     @Test
-    void executeShouldThrowExceptionWhenLicenseIsMissing(){
+    void executeShouldThrowExceptionWhenLicenseIsMissing() {
         properties.remove("license");
         assertThrows(IllegalArgumentException.class, () -> registerCarCommand.execute(properties));
     }
 
     @Test
-    void executeShouldThrowExceptionWhenTypeIsMissing(){
+    void executeShouldThrowExceptionWhenTypeIsMissing() {
         properties.remove("type");
         assertThrows(IllegalArgumentException.class, () -> registerCarCommand.execute(properties));
     }
 
     @Test
-    void executeShouldThrowExceptionWhenOwnerIsMissing(){
+    void executeShouldThrowExceptionWhenOwnerIsMissing() {
         properties.remove("owner");
         assertThrows(IllegalArgumentException.class, () -> registerCarCommand.execute(properties));
     }
 
     @Test
-    void executeShouldThrowExceptionWhenPermitExpirationIsInvalid(){
+    void executeShouldThrowExceptionWhenPermitExpirationIsInvalid() {
         properties.setProperty("permitExpiration", "2022-02-31");
         assertThrows(IllegalArgumentException.class, () -> registerCarCommand.execute(properties));
     }

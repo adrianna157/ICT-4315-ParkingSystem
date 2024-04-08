@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Properties;
 
 public class ParkingOfficeService {
-    private ParkingOffice parkingOffice;
-    private Map<String, Command> commands = new HashMap<>();
+    private final ParkingOffice parkingOffice;
+    private final Map<String, Command> commands = new HashMap<>();
 
     public ParkingOfficeService(ParkingOffice parkingOffice) {
         this.parkingOffice = parkingOffice;
@@ -25,8 +25,7 @@ public class ParkingOfficeService {
     }
 
 
-
-    public void register(Command command){
+    public void register(Command command) {
         // Register command with its name as the key in the commands map
         commands.put(command.getCommandName(), command);
     }

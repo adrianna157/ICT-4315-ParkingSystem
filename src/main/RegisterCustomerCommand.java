@@ -3,7 +3,7 @@ package main;
 import java.util.Properties;
 
 public class RegisterCustomerCommand implements Command {
-    private ParkingOffice parkingOffice;
+    private final ParkingOffice parkingOffice;
 
     public RegisterCustomerCommand(ParkingOffice parkingOffice) {
         this.parkingOffice = parkingOffice;
@@ -11,7 +11,7 @@ public class RegisterCustomerCommand implements Command {
 
     @Override
     public void checkParameters(Properties properties) {
-       Customer.validateProperties(properties);
+        Customer.validateProperties(properties);
     }
 
 
