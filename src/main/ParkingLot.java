@@ -1,11 +1,16 @@
 package main;
 
-import main.Address;
+import main.parking.charges.strategy.IParkingChargeStrategy;
+import main.parking.charges.factory.ParkingChargeStrategyFactory;
+
+import java.util.List;
 
 public class ParkingLot {
     private String lotId;
     private Address address;
     private int capacity;
+
+    private IParkingChargeStrategy parkingChargeStrategy;
 
     // Constructor that takes an main.Address object
     public ParkingLot(String lotId, Address address, int capacity) {
@@ -19,6 +24,16 @@ public class ParkingLot {
         this.lotId = lotId;
         this.address = new Address(streetAddress1, streetAddress2, city, state, zipCode);
         this.capacity = capacity;
+    }
+
+    // Method to assign a strategy using the factory
+    // Call this method with either "FLAT_RATE" or "HOURLY" to assign the corresponding strategy
+    public void assignStrategy(String strategy, List<Discount> discounts, Money baseRate) {
+        this.parkingChargeStrategy = ParkingChargeStrategyFactory.create(strategy, discounts, baseRate);
+    }
+
+    public IParkingChargeStrategy getParkingChargeStrategy() {
+        return parkingChargeStrategy;
     }
 
     public String getLotId() {

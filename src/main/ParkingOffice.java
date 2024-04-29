@@ -13,8 +13,8 @@ public class ParkingOffice {
     private List<Car> cars = new ArrayList<>();
     private List<ParkingLot> lots = new ArrayList<>();
     private List<ParkingCharge> charges = new ArrayList<>();
-    private TransactionManager transactionManager = new TransactionManager();
-    private PermitManager permitManager = new PermitManager();
+    private final TransactionManager transactionManager = new TransactionManager();
+    private final PermitManager permitManager = new PermitManager();
 
     public ParkingOffice(String name, Address address) {
         this.name = name;
@@ -33,19 +33,12 @@ public class ParkingOffice {
         this.name = name;
     }
 
-    public Address getAddress() {
-        return address;
-    }
 
     public void setAddress(Address address) {
         if (address == null) {
             throw new IllegalArgumentException("Address cannot be null");
         }
         this.address = address;
-    }
-
-    public List<Customer> getCustomers() {
-        return customers;
     }
 
     public void setCustomers(List<Customer> customers) {
@@ -64,10 +57,6 @@ public class ParkingOffice {
             throw new IllegalArgumentException("Cars cannot be null");
         }
         this.cars = cars;
-    }
-
-    public List<ParkingLot> getLots() {
-        return lots;
     }
 
     public void setLots(List<ParkingLot> lots) {
@@ -104,16 +93,6 @@ public class ParkingOffice {
         return newCar;
     }
 
-    // get a customer by name
-    public Customer getCustomer(String name) {
-        for (Customer customer : customers) {
-            if (customer.getName().equals(name)) {
-                return customer;
-            }
-        }
-        return null;
-    }
-
     // Add a parking charge to the list of charges and calculate the total charges in cents
     public Money addCharge(ParkingCharge charge) {
         charges.add(charge);
@@ -125,15 +104,10 @@ public class ParkingOffice {
         return new Money(totalCents);
     }
 
-    public ParkingTransaction park(Car car, ParkingLot lot, Money feeCharged) {
+    public ParkingTransaction park(Car car, ParkingLot lot, String strategy, List<Discount> discounts, Money baseRate) {
         ParkingPermit permit = permitManager.getPermit(car);
         Calendar date = Calendar.getInstance();
-        return transactionManager.park(date, permit, lot, feeCharged);
-    }
-
-    public Money getTotalParkingCharges(Car car) {
-        ParkingPermit permit = permitManager.getPermit(car);
-        return transactionManager.getParkingCharges(permit);
+        return transactionManager.park(date, permit, lot, strategy, discounts, baseRate);
     }
 
     public List<String> getCustomerIds() {
