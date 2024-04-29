@@ -9,6 +9,16 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ParkingOfficeTest {
+    private String hourlyStrategy;
+    private List<Discount> discounts;
+    private Money baseRate;
+
+    @BeforeEach
+    void setUp() {
+        hourlyStrategy = "HOURLY_RATE";
+        discounts = List.of(new Discount("Weekeday Discount", 10, List.of("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"), List.of(CarType.COMPACT)));
+        baseRate = new Money(1000);
+    }
 
 
     // Happy Path
@@ -36,7 +46,7 @@ class ParkingOfficeTest {
     void testAddCharge() {
         ParkingOffice office = new ParkingOffice("Parking Office", new Address("Street1", "Street2", "City", "State", "Zip"));
         ParkingCharge charge = new ParkingCharge("Permit01", "Lot01", Instant.now(), new Money(500));
-        office.setCharges(new ArrayList<>(Arrays.asList(charge)));
+        office.setCharges(new ArrayList<>(List.of(charge)));
 
         Money totalCharges = office.addCharge(new ParkingCharge("Permit02", "Lot02", Instant.now(), new Money(1000)));
         assertEquals(1500, totalCharges.getCents(), "Total charges should sum up correctly.");
@@ -119,13 +129,10 @@ class ParkingOfficeTest {
         ParkingLot lot = new ParkingLot("P123", "123 Main St", "", "Anytown", "Anystate", "12345", 50);
 
 
-        TransactionManager transactionManager = office.getTransactionManager();
         // Simulate a car parking without a valid permit by not registering the car first
         Car unregisteredCar = new Car("Permit99", LocalDate.now().plusYears(1), "XYZ999", CarType.SUV, "John Doe");
 
-        assertThrows(NullPointerException.class, () -> {
-            office.park(unregisteredCar, lot, new Money(500));
-        }, "Parking without a valid permit should not create a transaction.");
+        assertThrows(IllegalArgumentException.class, () -> office.park(unregisteredCar, lot, hourlyStrategy, discounts, baseRate), "Parking without a valid permit should not create a transaction.");
     }
 
     @Test

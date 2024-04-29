@@ -13,21 +13,26 @@ class TransactionManagerTest {
     private TransactionManager transactionManager;
     private ParkingPermit permit;
     private ParkingLot lot;
-    private Money feeCharged;
+
+    String hourlyStrategy;
+    List<Discount> discounts;
+    Money baseRate;
 
     @BeforeEach
     void setUp() {
         transactionManager = new TransactionManager();
         Car car = new Car("Permit01", LocalDate.now(), "LICENSE123", CarType.COMPACT, "John Doe");
         permit = new ParkingPermit("Permit01", car, Calendar.getInstance(), Calendar.getInstance());
-        ParkingLot lot = new ParkingLot("P123", "123 Main St", "", "Anytown", "Anystate", "12345", 50);
-        feeCharged = new Money(500); // Assuming the fee is in cents
+        lot = new ParkingLot("P123", "123 Main St", "", "Anytown", "Anystate", "12345", 50);
+        hourlyStrategy = "HOURLY";
+        discounts = List.of(new Discount("Weekeday Discount", 10, List.of("Monday", "Tuesday", "Wednesday", "Thursday", "Friday"), List.of(CarType.COMPACT)));
+        baseRate = new Money(1000);
     }
 
     // Happy Path
     @Test
     void park_ShouldCreateTransaction() {
-        ParkingTransaction transaction = transactionManager.park(Calendar.getInstance(), permit, lot, feeCharged);
+        ParkingTransaction transaction = transactionManager.park(Calendar.getInstance(), permit, lot, hourlyStrategy, discounts, baseRate);
 
         assertNotNull(transaction, "Transaction should not be null.");
         assertTrue(transactionManager.getTransactions().contains(transaction), "Transaction should be added to the list of transactions.");
@@ -35,17 +40,21 @@ class TransactionManagerTest {
 
     @Test
     void getParkingCharges_ShouldReturnCorrectTotal() {
-        transactionManager.park(Calendar.getInstance(), permit, lot, feeCharged);
-        transactionManager.park(Calendar.getInstance(), permit, lot, new Money(300)); // Additional charge
+        Calendar expirationDate = Calendar.getInstance();
+        expirationDate.add(Calendar.HOUR, 8);
+        permit.setExpirationDate(expirationDate);
+
+        transactionManager.park(Calendar.getInstance(), permit, lot, hourlyStrategy, discounts, baseRate);
+
 
         Money totalCharges = transactionManager.getParkingCharges(permit);
 
-        assertEquals(800, totalCharges.getCents(), "Total charges should be the sum of all charges for the permit.");
+        assertEquals(8000, totalCharges.getCents(), "Total charges should be the sum of all charges for the permit.");
     }
 
     @Test
     void getTransactions_ShouldReturnAllTransactions() {
-        transactionManager.park(Calendar.getInstance(), permit, lot, feeCharged);
+        transactionManager.park(Calendar.getInstance(), permit, lot, hourlyStrategy, discounts, baseRate);
 
         List<ParkingTransaction> transactions = transactionManager.getTransactions();
 
@@ -54,12 +63,12 @@ class TransactionManagerTest {
 
     @Test
     void getTransactionsForPermit_ShouldReturnCorrectTransactions() {
-        ParkingTransaction transaction1 = transactionManager.park(Calendar.getInstance(), permit, lot, feeCharged);
+        ParkingTransaction transaction1 = transactionManager.park(Calendar.getInstance(), permit, lot, hourlyStrategy, discounts, baseRate);
 
         // Simulating parking with a different permit
         Car anotherCar = new Car("Permit02", LocalDate.now(), "LICENSE456", CarType.SUV, "Jane Doe");
         ParkingPermit anotherPermit = new ParkingPermit("Permit02", anotherCar, Calendar.getInstance(), Calendar.getInstance());
-        transactionManager.park(Calendar.getInstance(), anotherPermit, lot, new Money(700));
+        transactionManager.park(Calendar.getInstance(), anotherPermit, lot, hourlyStrategy, discounts, baseRate);
 
         List<ParkingTransaction> transactions = transactionManager.getTransactions(permit);
 

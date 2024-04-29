@@ -1,14 +1,20 @@
 package main;
 
+import main.parking.charges.factory.ParkingChargeStrategyFactory;
+import main.parking.charges.strategy.IParkingChargeStrategy;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 
 public class TransactionManager {
-    private ArrayList<ParkingTransaction> transactions = new ArrayList<>();
-    private HashMap<String, ArrayList<ParkingTransaction>> vehicleTransaction = new HashMap<>();
+    private final ArrayList<ParkingTransaction> transactions = new ArrayList<>();
+    private final HashMap<String, ArrayList<ParkingTransaction>> vehicleTransaction = new HashMap<>();
 
-    public ParkingTransaction park(Calendar date, ParkingPermit permit, ParkingLot lot, Money feeCharged) {
+    public ParkingTransaction park(Calendar date, ParkingPermit permit, ParkingLot lot, String strategy, List<Discount> discounts, Money baseRate) {
+        IParkingChargeStrategy parkingChargeStrategy = ParkingChargeStrategyFactory.create(strategy, discounts, baseRate);
+        Money feeCharged = parkingChargeStrategy.calculateParkingFee(date.getTimeInMillis(), permit, permit.getExpirationDate().getTimeInMillis());
         ParkingTransaction transaction = new ParkingTransaction(date, permit, lot, feeCharged);
         transactions.add(transaction);
         String carId = permit.getCar().getPermit();
